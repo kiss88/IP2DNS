@@ -170,7 +170,7 @@ public class MainRun {
 			
 			InputStreamReader isReader = new InputStreamReader(ins, "GB2312");
 			BufferedReader bReader = new BufferedReader(isReader);
-			StringBuffer webContent = new StringBuffer();
+			StringBuilder webContent = new StringBuilder();
 			String str = null;
 			while ((str = bReader.readLine()) != null) {
 				webContent.append(str);
