@@ -5,22 +5,20 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.net.UnknownHostException;
 import java.util.Enumeration;
 import java.util.Properties;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import com.aliyun.api.AliyunClient;
 import com.aliyun.api.AliyunConstants;
@@ -38,6 +36,9 @@ public class MainRun {
 	private static String outIP = "";// 外网Ip
 	private static Executor executor;
 
+	private static URL url ;
+
+	
 	public static void init() throws IOException {
 		executor = Executors.newSingleThreadExecutor();
 		props = new Properties();
@@ -51,10 +52,11 @@ public class MainRun {
 		 */
 
 		String serverUrl = "http://dns.aliyuncs.com/";// 小万网云哥DNS解析
-		String accessKeyId = "*****";
-		String accessKeySecret = "******";
+		String accessKeyId = "********";
+		String accessKeySecret = "*********";
 
 		client = new DefaultAliyunClient(serverUrl, accessKeyId, accessKeySecret, AliyunConstants.FORMAT_JSON);
+		url = new URL(props.getProperty("ipurl", "http://1111.ip138.com/ic.asp"));
 
 	}
 
@@ -129,12 +131,12 @@ public class MainRun {
 			});
 			executor.execute(futureTask);
 			try {
-				futureTask.get(15000, TimeUnit.MILLISECONDS);
+				futureTask.get(30000, TimeUnit.MILLISECONDS);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			// 小睡10秒
-			Thread.sleep(1000 * 10);
+			// 小睡30秒
+			Thread.sleep(1000 * 30);
 
 		}
 
@@ -147,10 +149,25 @@ public class MainRun {
 	 */
 	private static String getMyIP() {
 		InputStream ins = null;
+		HttpURLConnection con =null;
 		try {
-			URL url = new URL(props.getProperty("ipurl", "http://1111.ip138.com/ic.asp"));
-			URLConnection con = url.openConnection();
+			System.out.print(-1);
+			con = (HttpURLConnection) url.openConnection();
+			con.setConnectTimeout(15000);
+			System.out.print(-2);
+			
+			con.setDoOutput(true);
+			con.setDoInput(true);
+			con.setUseCaches(false);
+			
+			System.out.print(1);
 			ins = con.getInputStream();
+			System.out.println(2);
+			
+			if(200!=con.getResponseCode()){
+				return "";
+			}
+			
 			InputStreamReader isReader = new InputStreamReader(ins, "GB2312");
 			BufferedReader bReader = new BufferedReader(isReader);
 			StringBuffer webContent = new StringBuffer();
@@ -168,6 +185,7 @@ public class MainRun {
 			if (ins != null) {
 				try {
 					ins.close();
+					con.disconnect();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
