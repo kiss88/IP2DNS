@@ -52,8 +52,8 @@ public class MainRun {
 		 */
 
 		String serverUrl = "http://dns.aliyuncs.com/";// 小万网云哥DNS解析
-		String accessKeyId = "********";
-		String accessKeySecret = "*********";
+		String accessKeyId = "******";
+		String accessKeySecret = "*******";
 
 		client = new DefaultAliyunClient(serverUrl, accessKeyId, accessKeySecret, AliyunConstants.FORMAT_JSON);
 		url = new URL(props.getProperty("ipurl", "http://1111.ip138.com/ic.asp"));
@@ -72,32 +72,33 @@ public class MainRun {
 		 * catch (ApiException e) { e.printStackTrace(); }
 		 */
 
-		{// 绑定本地Ip到local
-			String ipLocal = getLocalIP();
-			System.out.println(ipLocal);
-
-			if (!localIP.equals(ipLocal)) {
-				UpdateDomainRecordRequest request2 = new UpdateDomainRecordRequest();
-				UpdateDomainRecordResponse response2;
-				request2.setRecordId("63500319");
-				request2.setrR("local");
-				request2.setType("A");
-				request2.setValue(ipLocal);
-				try {
-					response2 = client.execute(request2);
-					System.out.println(response2.getBody());
-					if (null == response2.getErrorCode() || "".equals(response2.getErrorCode())) {
-						localIP = ipLocal;
-					}
-
-				} catch (ApiException e) {
-					e.printStackTrace();
-				}
-			}
-
-		}
-
 		while (true) {
+			{// 绑定本地Ip到local
+				String ipLocal = getLocalIP();
+				System.out.println(ipLocal);
+
+				if (!localIP.equals(ipLocal)) {
+					UpdateDomainRecordRequest request2 = new UpdateDomainRecordRequest();
+					UpdateDomainRecordResponse response2;
+					request2.setRecordId("63500319");
+					request2.setrR("local");
+					request2.setType("A");
+					request2.setValue(ipLocal);
+					try {
+						response2 = client.execute(request2);
+						System.out.println(response2.getBody());
+						if (null == response2.getErrorCode() || "".equals(response2.getErrorCode())) {
+							localIP = ipLocal;
+						}
+
+					} catch (ApiException e) {
+						e.printStackTrace();
+					}
+				}
+
+			}
+			
+			
 			//解決莫名的假死，沒法debug，先這樣搞
 			FutureTask<Void> futureTask = new FutureTask<Void>(new Callable<Void>() {
 
