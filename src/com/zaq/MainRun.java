@@ -135,6 +135,8 @@ public class MainRun {
 				futureTask.get(30000, TimeUnit.MILLISECONDS);
 			} catch (Exception e) {
 				e.printStackTrace();
+			}finally{
+				futureTask.cancel(true);//此处一定好中止任务，不然线程会一直没有完成，占满single线程池
 			}
 			// 小睡30秒
 			Thread.sleep(1000 * 30);
@@ -162,7 +164,7 @@ public class MainRun {
 			con.setUseCaches(false);
 			
 			System.out.print(1);
-			ins = con.getInputStream();
+			ins = con.getInputStream();//此外会无限阻塞，ip138是什么B服务器？
 			System.out.println(2);
 			
 			if(200!=con.getResponseCode()){
